@@ -4,8 +4,7 @@ const app = express()
 const path = require("path")
 const ejs = require('ejs')
 var bodyParser = require('body-parser')
-const repository = require('./inMemoryWorkshop');
-//const repository = require("./mongoWorkshop");
+const repository = require("./mongoWorkshop");
 
 repository.init().then(() => {
 
@@ -59,7 +58,17 @@ repository.init().then(() => {
     })
     
     app.post('/update-workshop', function(req, res) {
-        res.status(500).send("TODO")
+        const name = req.body.name
+        const description = req.body.description
+        repository.updateWorkshop(name, description).then(() => {
+            repository.getWorkshopList()
+            .then(workshops => {
+                res.render("index", {
+                    workshops: workshops
+                })
+            })
+        })
+        .catch(e =>res.send(e.message))
     })
     
     app.listen(3000, function () {
